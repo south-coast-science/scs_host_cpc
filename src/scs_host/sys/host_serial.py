@@ -21,15 +21,13 @@ class HostSerial(Serial):
     classdocs
     """
 
-    __PORT_PREFIX =     "/dev/ttyO"           # hard-coded path
-
     # ----------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, port_number, baud_rate, hard_handshake=False):
+    def __init__(self, device_path, baud_rate, hard_handshake=False):
         """
         Constructor
         """
-        super().__init__(port_number, baud_rate, hard_handshake)
+        super().__init__(device_path, baud_rate, hard_handshake)
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -61,11 +59,11 @@ class HostSerial(Serial):
 
     @property
     def port(self):
-        return self.__PORT_PREFIX + str(self._port_number)
+        return self._device_path
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     @property
     def __lock_name(self):
-        return self.__class__.__name__ + "-" + str(self._port_number)
+        return self.__class__.__name__ + "-" + str(self._device_path).replace("/", "_")

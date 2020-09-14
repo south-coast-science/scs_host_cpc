@@ -46,7 +46,8 @@ class Host(Node):
     __NDIR_SPI_ADDR =       '481a0000'                          # hard-coded memory-mapped io address
     __NDIR_SPI_DEVICE =     0                                   # hard-coded path
 
-    __GPS_DEVICE =          1                                   # hard-coded path
+    # GPS serial port device
+    __GPS_DEVICE =          '/dev/ttyS3'                        # hard-coded path
 
     __NDIR_USB_DEVICE =     '/dev/ttyUSB0'                      # hard-coded path (Alphasense USB device)
 
