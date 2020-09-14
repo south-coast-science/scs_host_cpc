@@ -40,6 +40,7 @@ class Host(Node):
     # ----------------------------------------------------------------------------------------------------------------
     # devices...
 
+    #  n.b. this currently unused with CubeMB see spi_bus method below
     __OPC_SPI_ADDR =        '48030000'                          # hard-coded memory-mapped io address
     __OPC_SPI_DEVICE =      0                                   # hard-coded path
 
@@ -94,6 +95,7 @@ class Host(Node):
 
     @staticmethod
     def spi_bus(spi_address, spi_device):
+        return 0  # hard-code spi bus number FIXME bodge
         context = pyudev.Context()
 
         kernel_path = '/ocp/spi@' + spi_address + '/channel@' + str(spi_device)
