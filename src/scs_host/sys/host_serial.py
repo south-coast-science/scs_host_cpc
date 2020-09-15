@@ -21,15 +21,13 @@ class HostSerial(Serial):
     classdocs
     """
 
-    __PORT_PREFIX =     "/dev/ttyO"           # hard-coded path
-
     # ----------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, port_number, baud_rate, hard_handshake=False):
+    def __init__(self, device_path, baud_rate, hard_handshake=False):
         """
         Constructor
         """
-        super().__init__(port_number, baud_rate, hard_handshake)
+        super().__init__(device_path, baud_rate, hard_handshake)
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -39,7 +37,7 @@ class HostSerial(Serial):
         Lock.acquire(self.__lock_name, lock_timeout)
 
         # port...
-        self._ser = serial.Serial(port=self.port, baudrate=self._baud_rate, timeout=comms_timeout,
+        self._ser = serial.Serial(port=self._device_identifier, baudrate=self._baud_rate, timeout=comms_timeout,
                                   parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
 
         time.sleep(0.5)     # as GE910 - 0.3
@@ -60,12 +58,12 @@ class HostSerial(Serial):
     # ----------------------------------------------------------------------------------------------------------------
 
     @property
-    def port(self):
-        return self.__PORT_PREFIX + str(self._port_number)
+    def device_identifier(self):
+        return self._device_identifier
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     @property
     def __lock_name(self):
-        return self.__class__.__name__ + "-" + str(self._port_number)
+        return self.__class__.__name__ + "-" + str(self._device_identifier).replace("/", "_")
