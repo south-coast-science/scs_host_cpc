@@ -29,8 +29,9 @@ class Host(Node):
 
     OS_ENV_PATH =           'SCS_ROOT_PATH'
 
+    # Hardware I²C bus numbers:
     I2C_EEPROM =            2
-    I2C_SENSORS =           2
+    I2C_SENSORS =           1
 
     DFE_EEPROM_ADDR =       0x50
     DFE_UID_ADDR =          0x58
@@ -39,13 +40,15 @@ class Host(Node):
     # ----------------------------------------------------------------------------------------------------------------
     # devices...
 
+    #  n.b. this currently unused with CubeMB see spi_bus method below
     __OPC_SPI_ADDR =        '48030000'                          # hard-coded memory-mapped io address
     __OPC_SPI_DEVICE =      0                                   # hard-coded path
 
     __NDIR_SPI_ADDR =       '481a0000'                          # hard-coded memory-mapped io address
     __NDIR_SPI_DEVICE =     0                                   # hard-coded path
 
-    __GPS_DEVICE =          1                                   # hard-coded path
+    # GPS serial port device
+    __GPS_DEVICE =          '/dev/ttyS3'                        # hard-coded path
 
     __NDIR_USB_DEVICE =     '/dev/ttyUSB0'                      # hard-coded path (Alphasense USB device)
 
@@ -92,6 +95,7 @@ class Host(Node):
 
     @staticmethod
     def spi_bus(spi_address, spi_device):
+        return 0  # hard-code spi bus number FIXME bodge
         context = pyudev.Context()
 
         kernel_path = '/ocp/spi@' + spi_address + '/channel@' + str(spi_device)
