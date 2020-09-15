@@ -96,6 +96,7 @@ class Host(Node):
     @staticmethod
     def spi_bus(spi_address, spi_device):
         return 0  # hard-code spi bus number FIXME bodge
+
         context = pyudev.Context()
 
         kernel_path = '/ocp/spi@' + spi_address + '/channel@' + str(spi_device)
