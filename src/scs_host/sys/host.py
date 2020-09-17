@@ -50,8 +50,6 @@ class Host(Node):
     # GPS serial port device
     __GPS_DEVICE =          '/dev/ttyS3'                        # hard-coded path
 
-    __NDIR_USB_DEVICE =     '/dev/ttyUSB0'                      # hard-coded path (Alphasense USB device)
-
     __PSU_DEVICE =          5                                   # hard-coded path
 
 
@@ -162,11 +160,6 @@ class Host(Node):
     @classmethod
     def gps_device(cls):
         return cls.__GPS_DEVICE             # we might have to search for it instead
-
-
-    @classmethod
-    def ndir_usb_device(cls):
-        return cls.__NDIR_USB_DEVICE        # we might have to search for it instead
 
 
     @classmethod
