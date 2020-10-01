@@ -79,13 +79,13 @@ class SPI(object):
 
     @property
     def __lock_name(self):
-        return self.__class__.__name__ + str(self.__bus)
+        return "%s-%s" % (self.__class__.__name__, self.__bus)
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     def xfer(self, args):
-        self.__connection.xfer(args)
+        return self.__connection.xfer(args)
 
 
     def read_bytes(self, count):
