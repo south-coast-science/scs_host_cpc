@@ -18,11 +18,12 @@ from pathlib import Path
 from scs_core.sys.disk_usage import DiskUsage
 from scs_core.sys.ipv4_address import IPv4Address
 from scs_core.sys.node import Node
+from scs_core.sys.persistence_manager import FilesystemPersistenceManager
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class Host(Node):
+class Host(Node, FilesystemPersistenceManager):
     """
     TI Sitara AM3358AZCZ100 processor
     """
