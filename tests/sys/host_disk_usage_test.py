@@ -11,7 +11,7 @@ from scs_host.sys.host import Host
 
 # --------------------------------------------------------------------------------------------------------------------
 
-home_dir = Host.home_dir()
+home_dir = Host.home_path()
 print("home_dir: %s" % home_dir)
 
 du = Host.disk_usage(home_dir)
