@@ -20,6 +20,7 @@ from scs_core.sys.disk_volume import DiskVolume
 from scs_core.sys.ipv4_address import IPv4Address
 from scs_core.sys.node import IoTNode
 from scs_core.sys.persistence_manager import FilesystemPersistenceManager
+from scs_core.sys.uptime_datum import UptimeDatum
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -207,6 +208,14 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def time_is_synchronized(cls):
         return Path(cls.__TIME_SYNCHRONIZED).exists()
+
+
+    @classmethod
+    def uptime(cls, now=None):
+        raw = subprocess.check_output('uptime')
+        report = raw.decode()
+
+        return UptimeDatum.construct_from_report(now, report)
 
 
     # ----------------------------------------------------------------------------------------------------------------
