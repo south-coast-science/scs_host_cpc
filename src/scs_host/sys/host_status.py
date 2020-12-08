@@ -12,7 +12,7 @@ from scs_core.data.json import JSONable
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class MCUDatum(JSONable):
+class HostStatus(JSONable):
     """
     classdocs
     """
@@ -46,4 +46,4 @@ class MCUDatum(JSONable):
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
-        return "MCUDatum:{temp:%0.1f}" % self.temp
+        return "HostStatus:{temp:%0.1f}" % self.temp
