@@ -33,8 +33,8 @@ class Host(IoTNode, FilesystemPersistenceManager):
     OS_ENV_PATH =           'SCS_ROOT_PATH'
 
     # Hardware I²C bus numbers:
-    I2C_EEPROM =            2
-    I2C_SENSORS =           1
+    I2C_UTILITIES =         1
+    I2C_SENSORS =           5
 
     DFE_EEPROM_ADDR =       0x50
     DFE_UID_ADDR =          0x58
@@ -51,7 +51,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     __NDIR_SPI_DEVICE =     0                                   # hard-coded path
 
     # GPS serial port device
-    __GPS_DEVICE =          '/dev/ttyS3'                        # hard-coded path
+    __GPS_DEVICE =          '/dev/ttyS0'                        # hard-coded path
 
     __PSU_DEVICE =          5                                   # hard-coded path
 
