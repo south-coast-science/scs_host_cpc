@@ -8,8 +8,6 @@ http://dumb-looks-free.blogspot.co.uk/2014/05/beaglebone-black-bbb-revision-seri
 """
 
 import os
-# import pyudev
-# import re
 import socket
 import subprocess
 
