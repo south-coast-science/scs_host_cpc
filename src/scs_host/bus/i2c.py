@@ -14,15 +14,13 @@ import fcntl
 import io
 import time
 
-from abc import ABC, abstractmethod
-
 from scs_host.lock.lock import Lock
 from scs_host.sys.host import Host
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class I2C(ABC):
+class I2C(object):
     """
     I2C bus abstraction over UNIX /dev/i2c-n
     """
@@ -37,77 +35,96 @@ class I2C(ABC):
 
     __LOCK_TIMEOUT =        2.0
 
-
     # ----------------------------------------------------------------------------------------------------------------
 
-    @classmethod
-    @abstractmethod
-    def fr(cls):
-        pass
-
+    Sensors = None
+    Utilities = None
+    EEPROM = None
 
     @classmethod
-    @abstractmethod
-    def fw(cls):
-        pass
+    def init(cls):
+        sensors = cls(Host.I2C_SENSORS)
+        utilities = cls(Host.I2C_UTILITIES)
 
-
-    @classmethod
-    @abstractmethod
-    def open(cls):
-        pass
-
-
-    @classmethod
-    @abstractmethod
-    def close(cls):
-        pass
+        cls.Sensors = sensors
+        cls.Utilities = utilities
+        cls.EEPROM = utilities
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    @classmethod
-    def start_tx(cls, device):
-        if cls.fr() is None or cls.fw() is None:
-            raise RuntimeError("cls.start_tx: bus is not open.")
+    def __init__(self, bus):
+        self.__bus = bus
 
-        Lock.acquire(cls.__name__, cls.__LOCK_TIMEOUT)
-
-        fcntl.ioctl(cls.fr(), cls.__I2C_SLAVE, device)
-        fcntl.ioctl(cls.fw(), cls.__I2C_SLAVE, device)
-
-
-    @classmethod
-    def end_tx(cls):
-        Lock.release(cls.__name__)
+        self.__fr = None
+        self.__fw = None
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    @classmethod
-    def read(cls, count):
-        read_bytes = list(cls.fr().read(count))
+    def open(self):
+        self.open_for_bus(self.__bus)
+
+
+    def open_for_bus(self, bus):
+        if self.__fr is not None and self.__fw is not None:
+            if bus != self.__bus:
+                raise RuntimeError("attempt to open bus %s when bus %s is already open" % (bus, self.__bus))
+            return
+
+        self.__fr = io.open("/dev/i2c-%d" % bus, "rb", buffering=0)
+        self.__fw = io.open("/dev/i2c-%d" % bus, "wb", buffering=0)
+
+
+    def close(self):
+        if self.__fw is not None:
+            self.__fw.close()
+            self.__fw = None
+
+        if self.__fr is not None:
+            self.__fr.close()
+            self.__fr = None
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    def start_tx(self, device):
+        if self.__fr is None or self.__fw is None:
+            self.open_for_bus(self.__bus)
+
+        Lock.acquire(self.__class__.__name__, self.__LOCK_TIMEOUT)
+
+        fcntl.ioctl(self.__fr, self.__I2C_SLAVE, device)
+        fcntl.ioctl(self.__fw, self.__I2C_SLAVE, device)
+
+
+    def end_tx(self):
+        Lock.release(self.__class__.__name__)
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    def read(self, count):
+        read_bytes = list(self.__fr.read(count))
         return read_bytes[0] if count == 1 else read_bytes
 
 
-    @classmethod
-    def read_cmd(cls, cmd, count, wait=None):
+    def read_cmd(self, cmd, count, wait=None):
         try:
             iter(cmd)
-            cls.write(*cmd)
+            self.write(*cmd)
 
         except TypeError:
-            cls.write(cmd)
+            self.write(cmd)
 
         if wait is not None:
             time.sleep(wait)
 
-        return cls.read(count)
+        return self.read(count)
 
 
-    @classmethod
-    def read_cmd16(cls, cmd16, count, wait=None):
-        cls.write16(cmd16)
+    def read_cmd16(self, cmd16, count, wait=None):
+        self.write16(cmd16)
 
         if wait is not None:
             time.sleep(wait)
@@ -115,153 +132,44 @@ class I2C(ABC):
         if count < 1:
             return []
 
-        return cls.read(count)
+        return self.read(count)
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    @classmethod
-    def write(cls, *values):
-        cls.fw().write(bytearray(values))
+    def write(self, *values):
+        self.__fw.write(bytearray(values))
 
 
-    @classmethod
-    def write16(cls, *value16s):
+    def write16(self, *value16s):
         write_bytes = bytearray()
 
         for value16 in value16s:
             write_bytes += bytes([value16 >> 8])
             write_bytes += bytes([value16 & 0xff])
 
-        cls.fw().write(write_bytes)
+        self.__fw.write(write_bytes)
 
 
-    @classmethod
-    def write_addr(cls, addr, *values):
-        cls.fw().write(bytearray([addr]) + bytes(values))
+    def write_addr(self, addr, *values):
+        self.__fw.write(bytearray([addr]) + bytes(values))
 
 
-    @classmethod
-    def write_addr16(cls, addr, *values):
+    def write_addr16(self, addr, *values):
         addr_msb = addr >> 8
         addr_lsb = addr & 0xff
 
-        cls.fw().write(bytearray([addr_msb, addr_lsb]) + bytes(values))
+        self.__fw.write(bytearray([addr_msb, addr_lsb]) + bytes(values))
 
-
-# --------------------------------------------------------------------------------------------------------------------
-
-class SensorI2C(I2C):
-    """
-    I2C bus abstraction over UNIX /dev/i2c-n
-    """
-
-    __FR = None
-    __FW = None
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    @classmethod
-    def fr(cls):
-        return cls.__FR
+    @property
+    def bus(self):
+        return self.__bus
 
-
-    @classmethod
-    def fw(cls):
-        return cls.__FW
-
-
-    @classmethod
-    def open(cls):
-        cls.open_for_bus(Host.I2C_SENSORS)
-
-
-    @classmethod
-    def open_for_bus(cls, bus):
-        if cls.__FR is not None and cls.__FW is not None:
-            return
-
-        cls.__FR = io.open("/dev/i2c-%d" % bus, "rb", buffering=0)
-        cls.__FW = io.open("/dev/i2c-%d" % bus, "wb", buffering=0)
-
-
-    @classmethod
-    def close(cls):
-        if cls.__FW is not None:
-            cls.__FW.close()
-            cls.__FW = None
-
-        if cls.__FR is not None:
-            cls.__FR.close()
-            cls.__FR = None
-
-
-# --------------------------------------------------------------------------------------------------------------------
-
-class UtilityI2C(I2C):
-    """
-    I2C bus abstraction over UNIX /dev/i2c-n
-    """
-
-    __FR = None
-    __FW = None
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    @classmethod
-    def fr(cls):
-        return cls.__FR
-
-
-    @classmethod
-    def fw(cls):
-        return cls.__FW
-
-
-    @classmethod
-    def open(cls):
-        if cls.__FR is not None and cls.__FW is not None:
-            return
-
-        cls.__FR = io.open("/dev/i2c-%d" % Host.I2C_UTILITIES, "rb", buffering=0)
-        cls.__FW = io.open("/dev/i2c-%d" % Host.I2C_UTILITIES, "wb", buffering=0)
-
-
-    @classmethod
-    def close(cls):
-        if cls.__FW is not None:
-            cls.__FW.close()
-            cls.__FW = None
-
-        if cls.__FR is not None:
-            cls.__FR.close()
-            cls.__FR = None
-
-
-# --------------------------------------------------------------------------------------------------------------------
-
-class EEPROMI2C(I2C):
-    """
-    I2C bus abstraction over UNIX /dev/i2c-n
-    """
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    @classmethod
-    def fr(cls):
-        return None
-
-
-    @classmethod
-    def fw(cls):
-        return None
-
-
-    @classmethod
-    def open(cls):
-        raise NotImplementedError
-
-
-    @classmethod
-    def close(cls):
-        raise NotImplementedError
+    def __str__(self, *args, **kwargs):
+        return "I2C:{bus:%s, fr:%s, fw:%s}" % (self.bus, self.__fr, self.__fw)
