@@ -7,6 +7,7 @@ A stdio abstraction, implementing ProcessComms
 """
 
 import sys
+import termios
 
 from scs_core.sys.process_comms import ProcessComms
 
@@ -22,11 +23,13 @@ class StdIO(ProcessComms):
 
     @staticmethod
     def prompt(prompt_str):
-        print(prompt_str, end="", file=sys.stderr)
-        sys.stderr.flush()
+        try:
+            termios.tcflush(sys.stdin, termios.TCIOFLUSH)           # flush stdin
+        except termios.error:
+            pass
 
-        line = sys.stdin.readline()
-        sys.stdout.flush()
+        print(prompt_str, end="", file=sys.stderr)
+        line = input().strip()
 
         return line.strip()
 
