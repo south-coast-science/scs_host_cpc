@@ -13,6 +13,8 @@ import subprocess
 
 from pathlib import Path
 
+from scs_core.estate.git_pull import GitPull
+
 from scs_core.sys.disk_usage import DiskUsage
 from scs_core.sys.disk_volume import DiskVolume
 from scs_core.sys.ipv4_address import IPv4Address
@@ -136,16 +138,10 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
 
     @classmethod
-    def software_update_report(cls):        # TODO: rework for git_pull
-        try:
-            f = open(os.path.join(cls.home_path(), cls.__SCS_DIR, cls.__LATEST_UPDATE))
-            report = f.read().strip()
-            f.close()
+    def software_update_report(cls):
+        git_pull = GitPull.load(cls)
 
-            return report
-
-        except FileNotFoundError:
-            return None
+        return None if git_pull is None else str(git_pull.pulled_on.datetime.date())
 
 
     # ----------------------------------------------------------------------------------------------------------------
