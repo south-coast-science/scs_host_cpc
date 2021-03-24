@@ -182,7 +182,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def sim(cls):
-        # modems...
+        # ModemList...
         p = subprocess.Popen(['mmcli', '-K', '-L'], stdout=subprocess.PIPE)
         stdout_bytes, _ = p.communicate(timeout=10)
 
@@ -193,7 +193,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
         if len(modems) < 1:
             return None
 
-        # SIMs...
+        # SIMList...
         p = subprocess.Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=subprocess.PIPE)
         stdout_bytes, _ = p.communicate(timeout=10)
 
