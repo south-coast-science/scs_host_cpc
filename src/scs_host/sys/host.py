@@ -18,6 +18,7 @@ from scs_core.sys.disk_volume import DiskVolume
 from scs_core.sys.ipv4_address import IPv4Address
 from scs_core.sys.node import IoTNode
 from scs_core.sys.persistence_manager import FilesystemPersistenceManager
+from scs_core.sys.sim import ModemList, SIM
 from scs_core.sys.uptime_datum import UptimeDatum
 
 
@@ -135,7 +136,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
 
     @classmethod
-    def software_update_report(cls):
+    def software_update_report(cls):        # TODO: rework for git_pull
         try:
             f = open(os.path.join(cls.home_path(), cls.__SCS_DIR, cls.__LATEST_UPDATE))
             report = f.read().strip()
@@ -178,6 +179,33 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def status(cls):
         return None
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # SIM...
+
+    @classmethod
+    def sim(cls):
+        # modems...
+        p = subprocess.Popen(['mmcli', '-K', '-L'], stdout=subprocess.PIPE)
+        stdout_bytes, _ = p.communicate(timeout=10)
+
+        if p.returncode != 0:
+            return None
+
+        modems = ModemList.construct_from_mmcli(stdout_bytes.decode().splitlines())
+
+        if len(modems) < 1:
+            return None
+
+        # SIM...
+        p = subprocess.Popen(['mmcli', '-K', '-i', modems.code(0)], stdout=subprocess.PIPE)
+        stdout_bytes, _ = p.communicate(timeout=10)
+
+        if p.returncode != 0:
+            return None
+
+        return SIM.construct_from_mmcli(stdout_bytes.decode().splitlines())
 
 
     # ----------------------------------------------------------------------------------------------------------------
