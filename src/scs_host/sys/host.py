@@ -8,9 +8,9 @@ http://dumb-looks-free.blogspot.co.uk/2014/05/beaglebone-black-bbb-revision-seri
 
 import os
 import socket
-import subprocess
 
 from pathlib import Path
+from subprocess import check_output, call, Popen, PIPE, DEVNULL
 
 from scs_core.estate.git_pull import GitPull
 
@@ -133,7 +133,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def shutdown(cls):
-        subprocess.call([cls.__SHUTDOWN_CMD, 'now'])
+        call([cls.__SHUTDOWN_CMD, 'now'])
 
 
     @classmethod
@@ -182,7 +182,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def sim(cls):
         # ModemList...
-        p = subprocess.Popen(['mmcli', '-K', '-L'], stdout=subprocess.PIPE)
+        p = Popen(['mmcli', '-K', '-L'], stdout=PIPE, stderr=DEVNULL)
         stdout, _ = p.communicate(timeout=10)
 
         if p.returncode != 0:
@@ -193,7 +193,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
             return None
 
         # SIMList...
-        p = subprocess.Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=subprocess.PIPE)
+        p = Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=PIPE, stderr=DEVNULL)
         stdout, _ = p.communicate(timeout=10)
 
         if p.returncode != 0:
@@ -204,7 +204,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
             return None
 
         # SIM...
-        p = subprocess.Popen(['mmcli', '-K', '-i', sims.number(0)], stdout=subprocess.PIPE)
+        p = Popen(['mmcli', '-K', '-i', sims.number(0)], stdout=PIPE, stderr=DEVNULL)
         stdout, _ = p.communicate(timeout=10)
 
         if p.returncode != 0:
@@ -246,7 +246,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def uptime(cls, now=None):
-        raw = subprocess.check_output('uptime')
+        raw = check_output('uptime')
         report = raw.decode()
 
         return UptimeDatum.construct_from_report(now, report)
@@ -256,7 +256,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def disk_volume(cls, mounted_on):
-        process = subprocess.Popen(['df'], stdout=subprocess.PIPE)
+        process = Popen(['df'], stdout=PIPE)
         out, _ = process.communicate()
         rows = out.decode().splitlines()[1:]
 
