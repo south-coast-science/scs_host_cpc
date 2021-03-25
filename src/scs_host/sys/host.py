@@ -4,7 +4,6 @@ Created on 16 Nov 2016
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
 
 http://dumb-looks-free.blogspot.co.uk/2014/05/beaglebone-black-bbb-revision-serial.html
-
 """
 
 import os
@@ -139,7 +138,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def software_update_report(cls):
-        git_pull = GitPull.load(cls)
+        git_pull = GitPull.load(cls, default=None)
 
         return None if git_pull is None else str(git_pull.pulled_on.datetime.date())
 
@@ -182,36 +181,36 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def sim(cls):
-        # modems...
+        # ModemList...
         p = subprocess.Popen(['mmcli', '-K', '-L'], stdout=subprocess.PIPE)
-        stdout_bytes, _ = p.communicate(timeout=10)
+        stdout, _ = p.communicate(timeout=10)
 
         if p.returncode != 0:
             return None
 
-        modems = ModemList.construct_from_mmcli(stdout_bytes.decode().splitlines())
+        modems = ModemList.construct_from_mmcli(stdout.decode().splitlines())
         if len(modems) < 1:
             return None
 
-        # SIMs...
+        # SIMList...
         p = subprocess.Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=subprocess.PIPE)
-        stdout_bytes, _ = p.communicate(timeout=10)
+        stdout, _ = p.communicate(timeout=10)
 
         if p.returncode != 0:
             return None
 
-        sims = SIMList.construct_from_mmcli(stdout_bytes.decode().splitlines())
+        sims = SIMList.construct_from_mmcli(stdout.decode().splitlines())
         if len(sims) < 1:
             return None
 
         # SIM...
         p = subprocess.Popen(['mmcli', '-K', '-i', sims.number(0)], stdout=subprocess.PIPE)
-        stdout_bytes, _ = p.communicate(timeout=10)
+        stdout, _ = p.communicate(timeout=10)
 
         if p.returncode != 0:
             return None
 
-        return SIM.construct_from_mmcli(stdout_bytes.decode().splitlines())
+        return SIM.construct_from_mmcli(stdout.decode().splitlines())
 
 
     # ----------------------------------------------------------------------------------------------------------------
