@@ -23,9 +23,7 @@ class StdIO(ProcessComms):
 
     __HISTORY_LENGTH =  100
     __VOCABULARY = []
-
-    __COMPLETION_DEFAULT =    'tab: complete'
-    __COMPLETION_DARWIN =     'bind ^I rl_complete'
+    __READLINE_COMPLETION = 'tab: complete'
 
     # ----------------------------------------------------------------------------------------------------------------
 
@@ -48,9 +46,7 @@ class StdIO(ProcessComms):
         # completion...
         cls.__VOCABULARY = vocabulary
 
-        binding = cls.__COMPLETION_DARWIN if sys.platform == 'darwin' else cls.__COMPLETION_DEFAULT
-        readline.parse_and_bind(binding)
-
+        readline.parse_and_bind(cls.__READLINE_COMPLETION)
         readline.set_completer(cls.completer)
 
         # history...
