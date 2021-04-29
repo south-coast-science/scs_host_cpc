@@ -6,6 +6,8 @@ Created on 27 May 2017
 A stdio abstraction, implementing ProcessComms
 """
 
+import os
+import readline
 import sys
 import termios
 
@@ -19,6 +21,12 @@ class StdIO(ProcessComms):
     classdocs
     """
 
+    __HISTORY_LENGTH =  100
+    __VOCABULARY = []
+
+    __COMPLETION_DEFAULT =    'tab: complete'
+    __COMPLETION_DARWIN =     'bind ^I rl_complete'
+
     # ----------------------------------------------------------------------------------------------------------------
 
     @staticmethod
@@ -28,10 +36,56 @@ class StdIO(ProcessComms):
         except termios.error:
             pass
 
-        print(prompt_str, end="", file=sys.stderr)
-        line = input().strip()
+        line = input(prompt_str).strip()
 
         return line.strip()
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def set(cls, vocabulary=(), history_filename=None):
+        # completion...
+        cls.__VOCABULARY = vocabulary
+
+        binding = cls.__COMPLETION_DARWIN if sys.platform == 'darwin' else cls.__COMPLETION_DEFAULT
+        readline.parse_and_bind(binding)
+
+        readline.set_completer(cls.completer)
+
+        # history...
+        if history_filename:
+            cls.load_history(history_filename)
+
+
+    @classmethod
+    def clear(cls):
+        cls.__VOCABULARY = ()
+        readline.set_completer(None)
+
+        readline.clear_history()
+
+
+    @classmethod
+    def completer(cls, text, state):
+        results = [token for token in cls.__VOCABULARY if token.startswith(text)]
+
+        return results[state]
+
+
+    @classmethod
+    def load_history(cls, filename):
+        if os.path.exists(filename):
+            try:
+                readline.read_history_file(filename)
+            except PermissionError:                         # macOS does this sometimes for no good reason
+                pass
+
+
+    @classmethod
+    def save_history(cls, filename):
+        readline.set_history_length(cls.__HISTORY_LENGTH)
+        readline.write_history_file(filename)
 
 
     # ----------------------------------------------------------------------------------------------------------------
