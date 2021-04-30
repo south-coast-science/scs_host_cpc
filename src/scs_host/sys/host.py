@@ -175,15 +175,8 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def modem(cls):
-        modems = cls.__modem_list()
-        if len(modems) < 1:
-            return None
-
-        # Modem (assume one modem)...
-        p = Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=PIPE, stderr=DEVNULL)
-        stdout, _ = p.communicate(timeout=10)
-
-        if p.returncode != 0:
+        stdout = cls.__modem_list()
+        if not stdout:
             return None
 
         return Modem.construct_from_mmcli(stdout.decode().splitlines())
@@ -191,15 +184,8 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def modem_conn(cls):
-        modems = cls.__modem_list()
-        if len(modems) < 1:
-            return None
-
-        # ModemConnection (assume one modem)...
-        p = Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=PIPE, stderr=DEVNULL)
-        stdout, _ = p.communicate(timeout=10)
-
-        if p.returncode != 0:
+        stdout = cls.__modem_list()
+        if not stdout:
             return None
 
         return ModemConnection.construct_from_mmcli(stdout.decode().splitlines())
@@ -207,15 +193,8 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def sim(cls):
-        modems = cls.__modem_list()
-        if len(modems) < 1:
-            return None
-
-        # SIMList (assume one modem)...
-        p = Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=PIPE, stderr=DEVNULL)
-        stdout, _ = p.communicate(timeout=10)
-
-        if p.returncode != 0:
+        stdout = cls.__modem_list()
+        if not stdout:
             return None
 
         sims = SIMList.construct_from_mmcli(stdout.decode().splitlines())
@@ -241,7 +220,19 @@ class Host(IoTNode, FilesystemPersistenceManager):
         if p.returncode != 0:
             return None
 
-        return ModemList.construct_from_mmcli(stdout.decode().splitlines())
+        modems = ModemList.construct_from_mmcli(stdout.decode().splitlines())
+
+        if len(modems) < 1:
+            return None
+
+        # Modem (assume one modem)...
+        p = Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=PIPE, stderr=DEVNULL)
+        stdout, _ = p.communicate(timeout=10)
+
+        if p.returncode != 0:
+            return None
+
+        return stdout
 
 
     # ----------------------------------------------------------------------------------------------------------------
