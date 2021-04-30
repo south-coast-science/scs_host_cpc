@@ -174,7 +174,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     # modem...
 
     @classmethod
-    def modem_connection(cls):
+    def modem_conn(cls):
         modems = cls.__modem_list()
         if len(modems) < 1:
             return None

@@ -11,6 +11,5 @@ from scs_host.sys.host import Host
 
 # --------------------------------------------------------------------------------------------------------------------
 
-connection = Host.modem_connection()
+connection = Host.modem_conn()
 print(connection)
-
