@@ -176,7 +176,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def modem(cls):
         modems = cls.__modem_list()
-        if len(modems) < 1:
+        if not modems or len(modems) < 1:
             return None
 
         # Modem (assume one modem)...
@@ -192,7 +192,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def modem_conn(cls):
         modems = cls.__modem_list()
-        if len(modems) < 1:
+        if not modems or len(modems) < 1:
             return None
 
         # ModemConnection (assume one modem)...
@@ -208,7 +208,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def sim(cls):
         modems = cls.__modem_list()
-        if len(modems) < 1:
+        if not modems or len(modems) < 1:
             return None
 
         # SIMList (assume one modem)...
