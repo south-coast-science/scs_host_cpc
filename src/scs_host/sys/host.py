@@ -17,9 +17,9 @@ from scs_core.estate.git_pull import GitPull
 from scs_core.sys.disk_usage import DiskUsage
 from scs_core.sys.disk_volume import DiskVolume
 from scs_core.sys.ipv4_address import IPv4Address
+from scs_core.sys.modem import ModemList, ModemConnection, SIMList, SIM
 from scs_core.sys.node import IoTNode
 from scs_core.sys.persistence_manager import FilesystemPersistenceManager
-from scs_core.sys.modem import ModemList, ModemConnection, SIMList, SIM
 from scs_core.sys.uptime_datum import UptimeDatum
 
 
