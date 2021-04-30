@@ -17,7 +17,7 @@ from scs_core.estate.git_pull import GitPull
 from scs_core.sys.disk_usage import DiskUsage
 from scs_core.sys.disk_volume import DiskVolume
 from scs_core.sys.ipv4_address import IPv4Address
-from scs_core.sys.modem import ModemList, ModemConnection, SIMList, SIM
+from scs_core.sys.modem import ModemList, Modem, ModemConnection, SIMList, SIM
 from scs_core.sys.node import IoTNode
 from scs_core.sys.persistence_manager import FilesystemPersistenceManager
 from scs_core.sys.uptime_datum import UptimeDatum
@@ -172,6 +172,22 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     # ----------------------------------------------------------------------------------------------------------------
     # modem...
+
+    @classmethod
+    def modem(cls):
+        modems = cls.__modem_list()
+        if len(modems) < 1:
+            return None
+
+        # Modem (assume one modem)...
+        p = Popen(['mmcli', '-K', '-m', modems.number(0)], stdout=PIPE, stderr=DEVNULL)
+        stdout, _ = p.communicate(timeout=10)
+
+        if p.returncode != 0:
+            return None
+
+        return Modem.construct_from_mmcli(stdout.decode().splitlines())
+
 
     @classmethod
     def modem_conn(cls):
