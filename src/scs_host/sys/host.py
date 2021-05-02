@@ -18,6 +18,7 @@ from scs_core.sys.disk_usage import DiskUsage
 from scs_core.sys.disk_volume import DiskVolume
 from scs_core.sys.ipv4_address import IPv4Address
 from scs_core.sys.modem import ModemList, Modem, ModemConnection, SIMList, SIM
+from scs_core.sys.network import Networks
 from scs_core.sys.node import IoTNode
 from scs_core.sys.persistence_manager import FilesystemPersistenceManager
 from scs_core.sys.uptime_datum import UptimeDatum
@@ -171,7 +172,18 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
 
     # ----------------------------------------------------------------------------------------------------------------
-    # modem...
+    # networks and modem...
+
+    @classmethod
+    def networks(cls):
+        p = Popen(['nmcli', 'd'], stdout=PIPE, stderr=DEVNULL)
+        stdout, _ = p.communicate(timeout=10)
+
+        if p.returncode != 0:
+            return None
+
+        return Networks.construct_from_nmcli(stdout.decode().splitlines())
+
 
     @classmethod
     def modem(cls):
