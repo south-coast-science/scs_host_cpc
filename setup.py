@@ -1,17 +1,51 @@
+#!/usr/bin/env python3
+
+"""
+Created on 4 Sep 2020
+Updated 23 Mar 2021
+
+@author: Jade Page (jade.page@southcoastscience.com)
+
+https://packaging.python.org/tutorials/packaging-projects/
+https://packaging.python.org/guides/single-sourcing-package-version/
+"""
+
+import codecs
+import os
+
 from setuptools import setup, find_packages
 
+
+# --------------------------------------------------------------------------------------------------------------------
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            return line.split("'")[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
+
+# --------------------------------------------------------------------------------------------------------------------
 
 with open('requirements.txt') as req_txt:
     required = [line for line in req_txt.read().splitlines() if line]
 
+
 setup(
-    name='scs_host_bbe_southern',
-    version='0.1.0',
-    description='Host abstractions for data producers or consumers running South Coast Science Debian on the \
-    BeagleBone Black.',
+    name='scs_host_cpc',
+    version=get_version("src/scs_host/__init__.py"),
+    description='Host abstractions for data producers running South Coast Science Debian on the \
+    Cube processor card.',
     author='South Coast Science',
     author_email='contact@southcoastscience.com',
-    url='https://github.com/south-coast-science/scs_host_bbe_southern',
+    url='https://github.com/south-coast-science/scs_host_cpc',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     classifiers=[
