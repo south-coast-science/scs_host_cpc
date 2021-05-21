@@ -3,7 +3,7 @@ Created on 16 Nov 2016
 
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
 
-http://dumb-looks-free.blogspot.co.uk/2014/05/beaglebone-black-bbb-revision-serial.html
+https://dumb-looks-free.blogspot.co.uk/2014/05/beaglebone-black-bbb-revision-serial.html
 """
 
 import os
@@ -196,9 +196,13 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def modem_conn(cls):
-        stdout = cls.__modem_list()
-        if not stdout:
+        if not cls.__modem_manager_is_enabled():
             return None
+
+        stdout = cls.__modem_list()
+
+        if not stdout:
+            return ModemConnection.null_datum()
 
         return ModemConnection.construct_from_mmcli(stdout.decode().splitlines())
 
@@ -221,6 +225,14 @@ class Host(IoTNode, FilesystemPersistenceManager):
             return None
 
         return SIM.construct_from_mmcli(stdout.decode().splitlines())
+
+
+    @classmethod
+    def __modem_manager_is_enabled(cls):
+        p = Popen(['systemctl', '-q', 'is-enabled', 'ModemManager.service'], stdout=PIPE, stderr=DEVNULL)
+        p.communicate(timeout=10)
+
+        return p.returncode == 0
 
 
     @classmethod
