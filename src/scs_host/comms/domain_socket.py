@@ -63,7 +63,7 @@ class DomainSocket(ProcessComms):
     # ----------------------------------------------------------------------------------------------------------------
 
     def connect(self, wait_for_availability=True):
-        self.__socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.__socket = socket.socket(family=socket.AF_UNIX, type=socket.SOCK_STREAM)
 
 
     def accept(self):

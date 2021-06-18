@@ -31,7 +31,7 @@ class SocketSender(object):
 
         self.__address = (host, port)
 
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM)
         self.__socket.connect(self.__address)
 
 
