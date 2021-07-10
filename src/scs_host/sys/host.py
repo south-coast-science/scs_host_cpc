@@ -133,7 +133,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def software_update_report(cls):
-        git_pull = GitPull.load(cls, shell=False)
+        git_pull = GitPull.load(cls)
 
         return None if git_pull is None else str(git_pull.pulled_on.datetime.date())
 
