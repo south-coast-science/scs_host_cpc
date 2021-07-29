@@ -11,7 +11,7 @@ from scs_host.sys.host_serial import HostSerial
 
 # --------------------------------------------------------------------------------------------------------------------
 
-serial = HostSerial(1, 9600, False)     # the PAM7 GPS receiver
+serial = HostSerial(1, 9600)        # the PAM7 GPS receiver
 print(serial)
 
 try:
