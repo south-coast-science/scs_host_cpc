@@ -57,7 +57,7 @@ class StdIO(ProcessComms):
     @classmethod
     def clear(cls):
         cls.__VOCABULARY = ()
-        readline.set_completer(None)
+        readline.set_completer()
 
         readline.clear_history()
 

@@ -37,8 +37,7 @@ class HostSerial(Serial):
         Lock.acquire(self.__lock_name, lock_timeout)
 
         # port...
-        self._ser = serial.Serial(port=self._device_identifier, baudrate=self._baud_rate, timeout=comms_timeout,
-                                  parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        self._ser = serial.Serial(port=self._device_identifier, baudrate=self._baud_rate, timeout=comms_timeout)
 
         time.sleep(0.5)     # as GE910 - 0.3
 
