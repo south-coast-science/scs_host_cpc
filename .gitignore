@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# South Coast Science
+**/.DS_Store
+**/*.log
+**/*.numbers
+**/*.xls
+**/*.xlsx
