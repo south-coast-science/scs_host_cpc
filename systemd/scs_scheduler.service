@@ -1,0 +1,25 @@
+[Unit]
+Description=SCS Scheduler
+ConditionPathExists=!/usr/local/etc/scs_machine_uncommissioned
+
+Requires=scs_greengrass.service
+After=scs_greengrass.service 
+
+Before=scs_data_collection.target
+PartOf=scs_data_collection.target
+
+[Service]
+# FIXME, change service type to 'notify' when the systmed sd_notify API has been implemented by the scheduler process
+#Type=notify
+Type=simple
+EnvironmentFile=/home/scs/.scs.env
+ExecStart=/home/scs/scs-venv/bin/python3 /home/scs/SCS/scs_dev/src/scs_dev/scheduler.py -v
+
+User=scs
+Group=scs
+
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

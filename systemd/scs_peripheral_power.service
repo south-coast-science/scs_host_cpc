@@ -1,0 +1,19 @@
+[Unit]
+Description=SCS Shutdown (NOP on start)
+ConditionPathExists=!/usr/local/etc/scs_machine_uncommissioned
+
+# "Before" in conjuction with "BindsTo" implies that this service will be stopped AFTER the bound units.
+
+BindsTo=scs_particulates_sampler.service scs_climate_sampler.service scs_gases_sampler.service scs_status_sampler.service
+Before=scs_particulates_sampler.service scs_climate_sampler.service scs_gases_sampler.service scs_status_sampler.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStop=/home/scs/bin/shutdown.sh
+
+User=scs
+Group=scs
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=SCS Data Collection
+ConditionPathExists=!/usr/local/etc/scs_machine_uncommissioned
+
+Wants=syslog.target
+After=syslog.target
+
+Wants=scs_climate_sampler.service scs_control_receiver.service scs_gases_sampler.service scs_led_controller.service scs_particulates_sampler.service scs_scheduler.service scs_status_sampler.service
+After=scs_climate_sampler.service scs_control_receiver.service scs_gases_sampler.service scs_led_controller.service scs_particulates_sampler.service scs_scheduler.service scs_status_sampler.service
+
+[Install]
+WantedBy=multi-user.target

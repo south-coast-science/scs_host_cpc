@@ -1,0 +1,25 @@
+[Unit]
+Description=SCS Climate Sampler
+ConditionPathExists=!/usr/local/etc/scs_machine_uncommissioned
+
+Requires=scs_greengrass.service
+After=scs_greengrass.service 
+
+Before=scs_data_collection.target
+PartOf=scs_data_collection.target
+
+[Service]
+# FIXME, change service type to 'notify' when the systmed sd_notify API has been implemented by the sampler process
+#Type=notify
+Type=simple
+EnvironmentFile=/home/scs/.scs.env
+ExecStart=/bin/sh -c 'trap "exit" INT TERM ; trap "kill 0 ; wait" EXIT ; exec /home/scs/scs-venv/bin/python3 /home/scs/SCS/scs_dev/src/scs_dev/climate_sampler.py -v -s scs-climate | /home/scs/scs-venv/bin/python3 /home/scs/SCS/scs_dev/src/scs_dev/csv_logger.py -v -e climate | /home/scs/scs-venv/bin/python3 /home/scs/SCS/scs_dev/src/scs_dev/aws_topic_publisher.py -v -cC -p /home/scs/SCS/pipes/mqtt_publication.uds'
+
+User=scs
+Group=scs
+
+Restart=always
+RestartSec=600
+
+[Install]
+WantedBy=multi-user.target

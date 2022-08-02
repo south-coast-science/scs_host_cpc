@@ -1,0 +1,17 @@
+[Unit]
+Description=SCS Time Confidence Service - If no battery RTC, then await network time sync...
+
+After=time-sync.target
+Before=scs_greengrass.service
+
+#Before=scs_data_collection.target
+#PartOf=scs_data_collection.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Polls for the SCS / Beaglebone-specific sysfs path to an I²C attached RTC chip
+ExecStart=/bin/sh -c 'while ! ( [ -f /run/systemd/timesync/synchronized ] || [ -d /sys/devices/platform/ocp/4819c000.i2c/i2c-2/2-0068/rtc/rtc0 ] || [ -d /sys/devices/platform/ahb/ahb:apb/f80480b0.rtc ] ) ; do echo No battery-backed RTC found - waiting for network time sync ; sleep 10 ; done && /usr/bin/touch /run/time_probably_ok'
+
+[Install]
+WantedBy=multi-user.target
