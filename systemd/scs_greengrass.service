@@ -1,0 +1,16 @@
+[Unit]
+Description=AWS Greengrass Core
+
+Requires=scs_time_confidence.service
+After=scs_time_confidence.service 
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/greengrass/ggc/core/greengrassd start
+
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

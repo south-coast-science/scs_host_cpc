@@ -1,0 +1,22 @@
+[Unit]
+Description=SCS LED controller
+ConditionPathExists=!/usr/local/etc/scs_machine_uncommissioned
+
+Before=scs_data_collection.target
+PartOf=scs_data_collection.target
+
+[Service]
+# FIXME, change service type to 'notify' when the systmed sd_notify API has been implemented by the sampler process
+#Type=notify
+Type=simple
+EnvironmentFile=/home/scs/.scs.env
+ExecStart=/home/scs/scs-venv/bin/python3 //home/scs/SCS/scs_dev/src/scs_dev/led_controller.py -u /home/scs/SCS/pipes/scs_led_control.uds
+
+User=scs
+Group=scs
+
+Restart=always
+RestartSec=600
+
+[Install]
+WantedBy=multi-user.target

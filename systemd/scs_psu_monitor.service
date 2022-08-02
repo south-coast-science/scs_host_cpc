@@ -1,0 +1,25 @@
+[Unit]
+Description=SCS PSU Monitor
+ConditionPathExists=!/usr/local/etc/scs_machine_uncommissioned
+DefaultDependencies=no
+After=sysinit.target
+Before=basic.target
+# On Beaglebone we address the power control mcu over serial port 5
+#Requires=dev-ttyS5.device
+#After=dev-ttyS5.device
+# On Cube Main boards, the power control mcu is addressed via i2c bus 1
+Requires=dev-i2c\x2d1.device
+After=dev-i2c\x2d1.device
+
+[Service]
+Type=simple
+EnvironmentFile=/home/scs/.scs.env
+ExecStart=/bin/bash -c 'trap "exit" INT TERM ; trap "kill 0 ; wait -n" EXIT ; exec /home/scs/scs-venv/bin/python3 /home/scs/SCS/scs_dev/src/scs_dev/psu_monitor.py -v -c -o'
+User=scs
+Group=scs
+Restart=always
+RestartSec=600
+
+[Install]
+WantedBy=sysinit.target
+
