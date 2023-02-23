@@ -77,7 +77,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     __LATEST_UPDATE =       "latest_update.txt"                 # hard-coded rel path
     __DFE_EEP_IMAGE =       'dfe_cape.eep'                      # hard-coded rel path
 
-    __COMMAND_TIMEOUT =     20                                  # seconds
+    __COMMAND_TIMEOUT =     10                                  # seconds
 
 
     # ----------------------------------------------------------------------------------------------------------------
