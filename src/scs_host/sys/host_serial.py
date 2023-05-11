@@ -21,6 +21,9 @@ class HostSerial(Serial):
     classdocs
     """
 
+    __POST_OPEN_DELAY =     0.1             # seconds
+    __POST_RELEASE_DELAY =  0.1             # seconds
+
     # ----------------------------------------------------------------------------------------------------------------
 
     def __init__(self, device_path, baud_rate, hard_handshake=False):
@@ -38,8 +41,7 @@ class HostSerial(Serial):
 
         # port...
         self._ser = serial.Serial(port=self._device_identifier, baudrate=self._baud_rate, timeout=comms_timeout)
-
-        time.sleep(0.5)     # as GE910 - 0.3
+        time.sleep(self.__POST_OPEN_DELAY)
 
 
     def close(self):
@@ -52,6 +54,7 @@ class HostSerial(Serial):
         finally:
             # lock...
             Lock.release(self.__lock_name)
+            time.sleep(self.__POST_RELEASE_DELAY)
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -65,4 +68,4 @@ class HostSerial(Serial):
 
     @property
     def __lock_name(self):
-        return self.__class__.__name__ + "-" + str(self._device_identifier).replace("/", "_")
+        return "-".join((self.__class__.__name__, str(self._device_identifier).replace("/", "_")))
