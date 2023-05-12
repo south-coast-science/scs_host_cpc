@@ -1,8 +1,8 @@
 """
 Created on 4 Jul 2016
 
-http://tightdev.net/SpiDev_Doc.pdf
-http://www.takaitra.com/posts/492
+https://tightdev.net/SpiDev_Doc.pdf
+https://www.takaitra.com/posts/492
 
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
 

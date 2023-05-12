@@ -28,16 +28,16 @@ class StdIO(ProcessComms):
     # ----------------------------------------------------------------------------------------------------------------
 
     @staticmethod
-    def prompt(request, default=''):
+    def prompt(request, default=None):
         try:
             termios.tcflush(sys.stdin, termios.TCIOFLUSH)           # flush stdin
         except termios.error:
             pass
 
         try:
-            prompt_str = request % default if default else request
+            prompt_str = request + ' (%s): ' % default if default else request + ': '
         except TypeError:
-            prompt_str = request
+            prompt_str = request + ': '            # no % format in request string
 
         line = input(prompt_str).strip()
 
