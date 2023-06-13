@@ -1,5 +1,7 @@
-paho-mqtt
-posix_ipc
-pyudev
-spidev
-pyserial
+# Versioning rules follow those specified in PEP 440
+# https://peps.python.org/pep-0440/
+
+posix_ipc ~=0.9
+#spidev == 3.6.1.dev1 @ git+https://github.com/tim-seoss/py-spidev.git@v3.6.1.dev1
+git+https://github.com/tim-seoss/py-spidev.git@v3.6.1.dev1#egg=spidev
+pyserial ~=3.4
