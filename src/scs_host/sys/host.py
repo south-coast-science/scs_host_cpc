@@ -29,7 +29,7 @@ from scs_core.sys.uptime_datum import UptimeDatum
 
 class Host(IoTNode, FilesystemPersistenceManager):
     """
-    TI Sitara AM3358AZCZ100 processor
+    SCS Cube MB v1
     """
 
     OS_ENV_PATH =           'SCS_ROOT_PATH'
@@ -45,12 +45,9 @@ class Host(IoTNode, FilesystemPersistenceManager):
     # ----------------------------------------------------------------------------------------------------------------
     # devices...
 
-    #  n.b. this currently unused with CubeMB see spi_bus method below
-    __OPC_SPI_ADDR =        '48030000'                          # hard-coded memory-mapped io address
-    __OPC_SPI_DEVICE =      0                                   # hard-coded path
+    __OPC_SPI_DEV_PATH =    '/dev/spi/by-compat/scs_cubemb_v1_spi_j6'       # udev-managed symlink to spidev
 
-    __NDIR_SPI_ADDR =       '481a0000'                          # hard-coded memory-mapped io address
-    __NDIR_SPI_DEVICE =     0                                   # hard-coded path
+    __NDIR_SPI_DEV_PATH =    '/dev/spi/by-compat/scs_cubemb_v1_spi_j12'     # udev-managed symlink to spidev
 
     # GPS serial port device
     __GPS_DEVICE =          '/dev/ttyS0'                        # hard-coded path
@@ -84,34 +81,6 @@ class Host(IoTNode, FilesystemPersistenceManager):
     # host acting as DHCP server...
 
     __SERVER_IPV4_ADDRESS = None                                # had-coded abs path
-
-
-    # ----------------------------------------------------------------------------------------------------------------
-
-    @staticmethod
-    def spi_bus(_spi_address, _spi_device):
-        return 0  # hard-code spi bus number FIXME bodge
-
-        # context = pyudev.Context()
-        #
-        # kernel_path = '/ocp/spi@' + spi_address + '/channel@' + str(spi_device)
-        #
-        # for device in context.list_devices(subsystem='spidev'):
-        #     parent = device.parent
-        #
-        #     if type(parent) and parent['OF_FULLNAME'] == kernel_path:
-        #         node = device.device_node
-        #
-        #         match = re.match(r'\D+(\d+).\d+', node)              # e.g. /dev/spidev1.0
-        #
-        #         if match is None:
-        #             continue
-        #
-        #         groups = match.groups()
-        #
-        #         return int(groups[0])
-        #
-        # raise OSError("No SPI bus could be found for %s" % kernel_path)
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -281,23 +250,12 @@ class Host(IoTNode, FilesystemPersistenceManager):
     # SPI...
 
     @classmethod
-    def ndir_spi_bus(cls):
-        return cls.spi_bus(cls.__NDIR_SPI_ADDR, cls.__NDIR_SPI_DEVICE)
-
-
-    @classmethod
-    def ndir_spi_device(cls):
-        return cls.__NDIR_SPI_DEVICE
-
+    def ndir_spi_dev_path(cls):
+        return cls.__NDIR_SPI_DEV_PATH
 
     @classmethod
-    def opc_spi_bus(cls):
-        return cls.spi_bus(cls.__OPC_SPI_ADDR, cls.__OPC_SPI_DEVICE)
-
-
-    @classmethod
-    def opc_spi_device(cls):
-        return cls.__OPC_SPI_DEVICE
+    def opc_spi_dev_path(cls):
+        return cls.__OPC_SPI_DEV_PATH
 
 
     # ----------------------------------------------------------------------------------------------------------------

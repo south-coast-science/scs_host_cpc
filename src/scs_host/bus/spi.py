@@ -1,8 +1,14 @@
 """
 Created on 4 Jul 2016
 
-https://tightdev.net/SpiDev_Doc.pdf
-https://www.takaitra.com/posts/492
+https://github.com/doceme/py-spidev
+https://www.takaitra.com/spi-device-raspberry-pi/
+
+n.b. This is currently using an unmerged PR for py-spidev
+https://github.com/doceme/py-spidev/pull/130
+
+Until this PR is merged, this PR branch should be installed into the local
+python virtualenv.
 
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
 
@@ -29,13 +35,12 @@ class SPI(object):
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, bus, device, mode, max_speed):
+    def __init__(self, dev_path, mode, max_speed):
         """
         Constructor
         """
 
-        self.__bus = bus
-        self.__device = device
+        self.__dev_path = dev_path
         self.__mode = mode
         self.__max_speed = max_speed
 
@@ -51,7 +56,7 @@ class SPI(object):
         self.acquire_lock()
 
         self.__connection = SpiDev()
-        self.__connection.open(self.__bus, self.__device)
+        self.__connection.open_path(self.__dev_path)
 
         self.__connection.mode = self.__mode
         self.__connection.max_speed_hz = self.__max_speed
@@ -76,10 +81,9 @@ class SPI(object):
     def release_lock(self):
         Lock.release(self.__lock_name)
 
-
     @property
     def __lock_name(self):
-        return "%s-%s" % (self.__class__.__name__, self.__bus)
+        return ("%s-%s" % (self.__class__.__name__, self.__dev_path)).replace('/', '_')
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -95,17 +99,12 @@ class SPI(object):
     # ----------------------------------------------------------------------------------------------------------------
 
     @property
-    def bus(self):
-        return self.__bus
-
-
-    @property
-    def device(self):
-        return self.__device
+    def dev_path(self):
+        return self.__dev_path
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
-        return "SPI:{bus:%d, device:%s, mode:%d, max_speed:%d, connection:%s}" % \
-               (self.__bus, self.__device, self.__mode, self.__max_speed, self.__connection)
+        return "SPI:{dev_path:%s, mode:%d, max_speed:%d, connection:%s}" % \
+               (self.__dev_path, self.__mode, self.__max_speed, self.__connection)
