@@ -64,6 +64,8 @@ class Host(IoTNode, FilesystemPersistenceManager):
     # ----------------------------------------------------------------------------------------------------------------
     # directories and files...
 
+    __HOSTNAME_PREFIX =     'scs-cube-'
+
     __DEFAULT_HOME_DIR =    '/home/scs'                         # hard-coded abs path
     __LOCK_DIR =            '/run/lock/southcoastscience'       # hard-coded abs path
     __TMP_DIR =             '/tmp/southcoastscience'            # hard-coded abs path
@@ -124,6 +126,11 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     # ----------------------------------------------------------------------------------------------------------------
     # network identity...
+
+    @classmethod
+    def hostname_prefix(cls):
+        return cls.__HOSTNAME_PREFIX
+
 
     @classmethod
     def name(cls):
