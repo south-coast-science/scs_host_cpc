@@ -22,6 +22,8 @@ class Flag(object):
     classdocs
     """
 
+    __WAIT_LOOP_DELAY = 1.0         # seconds
+
     # ----------------------------------------------------------------------------------------------------------------
 
     def __init__(self, name):
@@ -45,14 +47,17 @@ class Flag(object):
 
 
     def is_raised(self):
-        return self.name in [file.name for file in Filesystem.ls(Host.tmp_dir())]
+        if not os.path.exists(Host.tmp_dir()):
+            return False
+
+        return self.name in os.listdir(Host.tmp_dir())
 
 
     def wait_for_raised(self):
         self.__logger.info("waiting for %s..." % self.name)
 
         while not self.is_raised():
-            time.sleep(1)
+            time.sleep(self.__WAIT_LOOP_DELAY)
 
 
     # ----------------------------------------------------------------------------------------------------------------
