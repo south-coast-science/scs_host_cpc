@@ -32,6 +32,8 @@ class Host(IoTNode, FilesystemPersistenceManager):
     SCS Cube MB v1
     """
 
+    MINIMUM_OS_RELEASE =    '5.10.135'
+
     OS_ENV_PATH =           'SCS_ROOT_PATH'
 
     # Hardware I²C bus numbers:
@@ -140,6 +142,14 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def server_ipv4_address(cls):
         return IPv4Address.construct(cls.__SERVER_IPV4_ADDRESS)
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+    # version...
+
+    @classmethod
+    def minimum_os_release(cls):
+        return cls.MINIMUM_OS_RELEASE
 
 
     # ----------------------------------------------------------------------------------------------------------------
