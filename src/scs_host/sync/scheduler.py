@@ -17,6 +17,8 @@ from multiprocessing import Manager
 from scs_core.sync.interval_timer import IntervalTimer
 from scs_core.sync.synchronised_process import SynchronisedProcess
 
+from scs_core.sys.logging import Logging
+
 from scs_host.sync.binary_semaphore import BinarySemaphore, BusyError, SignalError
 
 
@@ -27,8 +29,8 @@ class Scheduler(object):
     classdocs
     """
 
-    RELEASE_PERIOD =                0.3         # ScheduleItem release period
-    HOLD_PERIOD =                   0.6         # ScheduleRunner hold period
+    RELEASE_PERIOD =                0.3             # ScheduleItem release period
+    HOLD_PERIOD =                   0.6             # ScheduleRunner hold period
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -37,10 +39,10 @@ class Scheduler(object):
         """
         Constructor
         """
-        self.__schedule = schedule              # Schedule
-        self.__verbose = verbose                # bool
+        self.__schedule = schedule                  # Schedule
+        self.__verbose = verbose                    # bool
 
-        self.__jobs = []                        # array of SchedulerItem
+        self.__jobs = []                            # array of SchedulerItem
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -98,14 +100,17 @@ class SchedulerItem(SynchronisedProcess):
         """
         Constructor
         """
+        self.__logger = Logging.getLogger()
+        self.__logging_specification = Logging.specification()
+
         manager = Manager()
 
         SynchronisedProcess.__init__(self, manager.list())
 
         self._value.append(True)
 
-        self.__item = item                                      # ScheduleItem
-        self.__verbose = verbose                                # bool
+        self.__item = item                                          # ScheduleItem
+        self.__verbose = verbose                                    # bool
 
         self.__mutex = BinarySemaphore(self.item.name, True)
 
@@ -116,7 +121,7 @@ class SchedulerItem(SynchronisedProcess):
     def stop(self):
         try:
             try:
-                self.__mutex.acquire(self.item.interval)        # attempt to re-capture the mutex
+                self.__mutex.acquire(self.item.interval)            # attempt to re-capture the mutex
             except (BusyError, SignalError):
                 pass
 
@@ -127,6 +132,9 @@ class SchedulerItem(SynchronisedProcess):
 
 
     def run(self):
+        Logging.replicate(self.__logging_specification)
+        self.__logger = Logging.getLogger()
+
         try:
             timer = IntervalTimer(self.item.interval)
 
@@ -144,7 +152,7 @@ class SchedulerItem(SynchronisedProcess):
                     # release...
                     self.__mutex.release()
 
-                    print('%s.run: released on busy' % self.item.name, file=sys.stderr)
+                    self.__logger.error('%s.run: released on busy' % self.item.name)
                     sys.stderr.flush()
 
         except (ConnectionError, KeyboardInterrupt, SignalError, SystemExit):
