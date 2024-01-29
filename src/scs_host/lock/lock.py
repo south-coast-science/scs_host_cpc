@@ -145,8 +145,8 @@ class Lock(object):
         ident_dir = cls.__ident_dir(name, os.getpid())
 
         try:
-            os.mkdir(name_dir, 0o777)       # TODO: why does the mod not work on mkdir?
-            os.mkdir(ident_dir, 0o777)      # TODO: why does the mod not work on mkdir?
+            os.mkdir(name_dir)              # TODO: mode: 0o777 - why does the mod not work on mkdir?
+            os.mkdir(ident_dir)             # TODO: mode: 0o777 - why does the mod not work on mkdir?
             return True
 
         except FileExistsError:
