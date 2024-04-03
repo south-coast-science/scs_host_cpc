@@ -33,7 +33,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     SCS Cube MB v1
     """
 
-    MINIMUM_OS_RELEASE = '5.10.135'
+    MINIMUM_OS_RELEASE = '5.10.214'                     # was 5.10.135
     MINIMUM_GREENGRASS_RELEASE = '1.11.5'
 
     OS_ENV_PATH =           'SCS_ROOT_PATH'
