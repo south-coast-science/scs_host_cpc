@@ -151,12 +151,12 @@ class Host(IoTNode, FilesystemPersistenceManager):
     # version...
 
     @classmethod
-    def is_acceptable_os_release(cls):
+    def has_acceptable_os_release(cls):
         return cls.os_release() in cls.OS_WHITELIST
 
 
     @classmethod
-    def is_acceptable_kernel_release(cls):
+    def has_acceptable_kernel_release(cls):
         return cls.kernel_release() in cls.KERNEL_WHITELIST
 
 
