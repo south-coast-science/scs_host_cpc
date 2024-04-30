@@ -4,8 +4,6 @@ Created on 2 Oct 2016
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
 """
 
-from collections import OrderedDict
-
 from scs_core.data.datum import Datum
 from scs_core.data.json import JSONable
 
