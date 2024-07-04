@@ -73,7 +73,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     __DEFAULT_HOME_DIR =    '/home/scs'                         # hard-coded abs path
     __LOCK_DIR =            '/run/lock/southcoastscience'       # hard-coded abs path
-    __TMP_DIR =             '/tmp/southcoastscience'            # hard-coded abs path
+    __TMP_DIR =             '/dev/shm/southcoastscience'        # hard-coded abs path
 
     __SCS_DIR =             'SCS'                               # hard-coded rel path
     __COMMAND_DIR =         'cmd'                               # hard-coded rel path
@@ -88,6 +88,13 @@ class Host(IoTNode, FilesystemPersistenceManager):
     # host acting as DHCP server...
 
     __SERVER_IPV4_ADDRESS = None                                # had-coded abs path
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    @classmethod
+    def init(cls):
+        os.makedirs(cls.__TMP_DIR, exist_ok=True)
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -355,6 +362,11 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def tmp_dir(cls):
         return cls.__TMP_DIR
+
+
+    @classmethod
+    def tmp_file(cls, filename):
+        return os.path.join(cls.__TMP_DIR, filename)
 
 
     # ----------------------------------------------------------------------------------------------------------------
