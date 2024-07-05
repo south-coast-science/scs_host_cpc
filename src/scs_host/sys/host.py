@@ -94,7 +94,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def init(cls):
-        os.makedirs(cls.__TMP_DIR, exist_ok=True)
+        cls.__make_tmp_dir()
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -365,6 +365,15 @@ class Host(IoTNode, FilesystemPersistenceManager):
     @classmethod
     def tmp_file(cls, filename):
         return os.path.join(cls.__TMP_DIR, filename)
+
+
+    @classmethod
+    def __make_tmp_dir(cls):
+        if os.path.isdir(cls.__TMP_DIR):
+            return
+
+        os.makedirs(cls.__TMP_DIR)
+        os.chmod(cls.__TMP_DIR, 0o777)
 
 
     # ----------------------------------------------------------------------------------------------------------------
