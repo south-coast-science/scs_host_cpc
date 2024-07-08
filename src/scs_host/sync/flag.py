@@ -33,6 +33,8 @@ class Flag(object):
         self.__name = name
         self.__logger = Logging.getLogger()
 
+        self.lower_flag()
+
 
     # ----------------------------------------------------------------------------------------------------------------
 
