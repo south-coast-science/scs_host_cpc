@@ -4,13 +4,16 @@ Created on 16 Nov 2016
 @author: Bruno Beloff (bruno.beloff@southcoastscience.com)
 
 https://dumb-looks-free.blogspot.co.uk/2014/05/beaglebone-black-bbb-revision-serial.html
+
+https://unix.stackexchange.com/questions/113975/configure-gsm-connection-using-nmcli
+/etc/NetworkManager/system-connections/
 """
 
 import os
 import socket
 
 from pathlib import Path
-from subprocess import check_output, call, Popen, PIPE, DEVNULL, TimeoutExpired
+from subprocess import check_output, call, Popen, run, PIPE, DEVNULL, TimeoutExpired
 
 from scs_core.estate.git_pull import GitPull
 from scs_core.estate.software_version import SoftwareVersion
@@ -300,6 +303,7 @@ class Host(IoTNode, FilesystemPersistenceManager):
     def ndir_spi_dev_path(cls):
         return cls.__NDIR_SPI_DEV_PATH
 
+
     @classmethod
     def opc_spi_dev_path(cls):
         return cls.__OPC_SPI_DEV_PATH
@@ -369,11 +373,13 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def __make_tmp_dir(cls):
-        if os.path.isdir(cls.__TMP_DIR):
-            return
-
-        os.makedirs(cls.__TMP_DIR)
-        os.chmod(cls.__TMP_DIR, 0o777)
+        if os.geteuid() == 0:
+            run(['su', 'scs', '-c', 'mkdir -p --mode=0700 ' + cls.__TMP_DIR])
+        else:
+            try:
+                os.mkdir(cls.__TMP_DIR, mode=0o700)
+            except FileExistsError:
+                pass
 
 
     # ----------------------------------------------------------------------------------------------------------------
