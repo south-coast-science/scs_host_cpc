@@ -13,7 +13,7 @@ import os
 import socket
 
 from pathlib import Path
-from subprocess import check_output, call, Popen, PIPE, DEVNULL, TimeoutExpired
+from subprocess import check_output, call, Popen, run, PIPE, DEVNULL, TimeoutExpired
 
 from scs_core.estate.git_pull import GitPull
 from scs_core.estate.software_version import SoftwareVersion
@@ -373,11 +373,13 @@ class Host(IoTNode, FilesystemPersistenceManager):
 
     @classmethod
     def __make_tmp_dir(cls):
-        try:
-            os.mkdir(cls.__TMP_DIR)
-            os.chmod(cls.__TMP_DIR, 0o777)
-        except FileExistsError:
-            pass
+        if os.geteuid() == 0:
+            run(['su', 'scs', '-c', 'mkdir -p --mode=0700 ' + cls.__TMP_DIR])
+        else:
+            try:
+                os.mkdir(cls.__TMP_DIR, mode=0o700)
+            except FileExistsError:
+                pass
 
 
     # ----------------------------------------------------------------------------------------------------------------
